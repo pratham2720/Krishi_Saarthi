@@ -1,5 +1,7 @@
 # 🌾 AgriSmart - Intelligent Agriculture Management Platform
 
+**Presenting this project? Start with [PRESENTATION.md](PRESENTATION.md).** It includes the tested local setup, sample login, demo walkthrough, and integration limitations.
+
 <div align="center">
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -100,27 +102,14 @@ AgriSmart (formerly KrishiSaarthi) is a comprehensive farm management system bui
 | Requirement | Version | Purpose |
 |-------------|---------|---------|
 | Python | 3.11+ | Backend runtime |
-| Node.js | 18+ | Frontend build |
+| Node.js | 22.12+ | Frontend build |
 | Google Earth Engine | Account | Satellite data |
 | Gemini API Key | - | AI features |
 | OpenWeather API | Optional | Weather data |
 
-### One-Command Setup (Windows)
+### Presentation setup
 
-```powershell
-# Clone the repository
-git clone https://github.com/yourusername/agrismart.git
-cd agrismart
-
-# Run setup script
-.\setup.ps1
-
-# Configure environment
-# Edit backend/.env with your API keys
-
-# Start development servers
-.\dev.ps1
-```
+Follow [PRESENTATION.md](PRESENTATION.md) to install the dependencies, then run `python present.py` from the repository root. This starts both servers and seeds a separate demo database without requiring API keys.
 
 ### Manual Setup
 

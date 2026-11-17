@@ -36,43 +36,31 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: process.env.API_PROXY_TARGET || 'http://127.0.0.1:8000',
         changeOrigin: true,
       },
       '/field': {
-        target: 'http://localhost:8000',
+        target: process.env.API_PROXY_TARGET || 'http://127.0.0.1:8000',
         changeOrigin: true,
       },
       '/finance': {
-        target: 'http://localhost:8000',
+        target: process.env.API_PROXY_TARGET || 'http://127.0.0.1:8000',
         changeOrigin: true,
       },
       '/planning': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-      },
-      '/login': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-      },
-      '/signup': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-      },
-      '/password-reset': {
-        target: 'http://localhost:8000',
+        target: process.env.API_PROXY_TARGET || 'http://127.0.0.1:8000',
         changeOrigin: true,
       },
       '/health': {
-        target: 'http://localhost:8000',
+        target: process.env.API_PROXY_TARGET || 'http://127.0.0.1:8000',
         changeOrigin: true,
       },
       '/pest': {
-        target: 'http://localhost:8000',
+        target: process.env.API_PROXY_TARGET || 'http://127.0.0.1:8000',
         changeOrigin: true,
       },
       '/media': {
-        target: 'http://localhost:8000',
+        target: process.env.API_PROXY_TARGET || 'http://127.0.0.1:8000',
         changeOrigin: true,
       },
     },

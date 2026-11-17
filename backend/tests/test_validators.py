@@ -112,7 +112,7 @@ class SoilAdviceValidationTestCase(TestCase):
         mock_response = MagicMock()
         mock_response.text = '{"recommendations": "test"}'
 
-        with patch('field.views.soil_advice.genai') as mock_genai:
+        with patch.dict('os.environ', {'GEMINI_API_KEY': 'test-key'}), patch('field.views.soil_advice.genai') as mock_genai:
             mock_model = MagicMock()
             mock_model.generate_content.return_value = mock_response
             mock_genai.GenerativeModel.return_value = mock_model
@@ -144,7 +144,7 @@ class SoilAdviceValidationTestCase(TestCase):
         from unittest.mock import patch, MagicMock
         mock_response = MagicMock()
         mock_response.text = '{"recommendations": "test"}'
-        with patch('field.views.soil_advice.genai') as mock_genai:
+        with patch.dict('os.environ', {'GEMINI_API_KEY': 'test-key'}), patch('field.views.soil_advice.genai') as mock_genai:
             mock_model = MagicMock()
             mock_model.generate_content.return_value = mock_response
             mock_genai.GenerativeModel.return_value = mock_model

@@ -137,8 +137,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             localStorage.setItem("authUser", JSON.stringify(data.user));
 
             return { success: true };
-        } catch {
-            return { success: false, error: "Network error. Please try again." };
+        } catch (error) {
+            return { success: false, error: error instanceof Error ? error.message : "Network error. Please try again." };
         }
     };
 

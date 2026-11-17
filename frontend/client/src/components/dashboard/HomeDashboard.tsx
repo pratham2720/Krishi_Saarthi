@@ -16,12 +16,7 @@ import { useWeather } from "@/hooks/useWeather";
 import { useHealthScore } from "@/hooks/useHealthScore";
 
 interface MarketData {
-    crops_summary: {
-        crop: string;
-        modal_price: number;
-        change: number;
-        trend: string;
-    }[] | null;
+    prices: { crop: string; msp: number | null; estimated_range: { low: number; high: number } }[];
 }
 
 export function HomeDashboard({ onNavigate }: { onNavigate: (tab: string) => void }) {
@@ -67,14 +62,10 @@ export function HomeDashboard({ onNavigate }: { onNavigate: (tab: string) => voi
             setMarketError(null);
             try {
                 const data = await apiFetch<MarketData>('/finance/market-prices?state=Punjab');
-                if (data && data.crops_summary) {
-                    const formatPrices = data.crops_summary.slice(0, 3).map(c => ({
-                        commodity: c.crop,
-                        price: c.modal_price,
-                        change: `${c.change >= 0 ? '+' : ''}${c.change}%`
-                    }));
-                    setMarketPrices(formatPrices);
-                }
+                setMarketPrices(data.prices.slice(0, 3).map(c => ({
+                    commodity: c.crop, price: c.msp?.toLocaleString('en-IN') || 'Not set',
+                    range: `₹${c.estimated_range.low.toLocaleString('en-IN')}–₹${c.estimated_range.high.toLocaleString('en-IN')}`,
+                })));
             } catch (error) {
                 logger.error("Market fetch error:", error);
                 setMarketError("Unable to load market prices");
@@ -152,8 +143,8 @@ export function HomeDashboard({ onNavigate }: { onNavigate: (tab: string) => voi
                 <Card className="lg:col-span-8">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 border-b">
                         <div className="space-y-1">
-                            <CardTitle>Yield Prediction</CardTitle>
-                            <CardDescription>Estimated output based on current conditions vs last year.</CardDescription>
+                            <CardTitle>Vegetation Trend (NDVI)</CardTitle>
+                            <CardDescription>Vegetation index over time. Higher values generally indicate denser green cover.</CardDescription>
                         </div>
                     </CardHeader>
                     <CardContent className="p-6">
@@ -163,8 +154,8 @@ export function HomeDashboard({ onNavigate }: { onNavigate: (tab: string) => voi
                                     <AreaChart data={predictionData.ndvi.time_series}>
                                         <defs>
                                             <linearGradient id="colorNdvi" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8} />
-                                                <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                                                <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.8} />
+                                                <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
                                             </linearGradient>
                                         </defs>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} strokeOpacity={0.2} />
@@ -182,11 +173,11 @@ export function HomeDashboard({ onNavigate }: { onNavigate: (tab: string) => voi
                                             tick={{ fill: 'currentColor', fontSize: 12, opacity: 0.5 }}
                                         />
                                         <Tooltip
-                                            contentStyle={{ backgroundColor: 'hsl(var(--background))', borderRadius: '8px', border: '1px solid hsl(var(--border))', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                            contentStyle={{ backgroundColor: 'var(--background)', borderRadius: '8px', border: '1px solid var(--border)', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                                             labelFormatter={(date) => new Date(date).toLocaleDateString()}
                                             formatter={(value: number) => [value.toFixed(2), "NDVI"]}
                                         />
-                                        <Area type="monotone" dataKey="ndvi" stroke="hsl(var(--primary))" strokeWidth={3} fillOpacity={1} fill="url(#colorNdvi)" />
+                                        <Area type="monotone" dataKey="ndvi" stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorNdvi)" />
                                     </AreaChart>
                                 </ResponsiveContainer>
                             ) : (
@@ -254,9 +245,9 @@ export function HomeDashboard({ onNavigate }: { onNavigate: (tab: string) => voi
                             <TableHeader>
                                 <TableRow>
                                     <TableHead className="px-6 py-4">Commodity</TableHead>
-                                    <TableHead className="px-6 py-4">Price (per Quintal)</TableHead>
-                                    <TableHead className="px-6 py-4">Change</TableHead>
-                                    <TableHead className="px-6 py-4">Trend</TableHead>
+                                    <TableHead className="px-6 py-4">Reference MSP / quintal</TableHead>
+                                    <TableHead className="px-6 py-4">Estimated range</TableHead>
+                                    <TableHead className="px-6 py-4">Source</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -285,21 +276,8 @@ export function HomeDashboard({ onNavigate }: { onNavigate: (tab: string) => voi
                                                 {item.commodity}
                                             </TableCell>
                                             <TableCell className="px-6 py-4 text-muted-foreground font-mono">₹{item.price}</TableCell>
-                                            <TableCell className={`px-6 py-4 font-medium`}>
-                                                <div className={`flex items-center gap-1 ${item.change.includes('+') ? 'text-green-600' : 'text-red-600'}`}>
-                                                    <span className="material-symbols-outlined text-sm">
-                                                        {item.change.includes('+') ? 'trending_up' : 'trending_down'}
-                                                    </span>
-                                                    {item.change}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="px-6 py-4">
-                                                <div className="w-24 h-8">
-                                                    <svg className={`w-full h-full fill-none stroke-2 ${item.change.includes('+') ? 'stroke-green-600' : 'stroke-red-600'}`} viewBox="0 0 100 30">
-                                                        <path d="M0,25 Q10,28 20,20 T40,15 T60,20 T80,10 T100,5"></path>
-                                                    </svg>
-                                                </div>
-                                            </TableCell>
+                                            <TableCell className="px-6 py-4">{item.range}</TableCell>
+                                            <TableCell className="px-6 py-4 text-muted-foreground">2025–26 reference</TableCell>
                                         </TableRow>
                                     ))
                                 ) : (

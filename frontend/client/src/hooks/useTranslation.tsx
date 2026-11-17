@@ -11,7 +11,7 @@ const TranslationContext = createContext<TranslationContextType | undefined>(und
 
 export function TranslationProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Language>(
-    () => (localStorage.getItem('language') as Language) || 'en'
+    () => { const saved = localStorage.getItem('language'); return saved && saved in translations ? saved as Language : 'en'; }
   );
 
   // Persist language choice to localStorage
@@ -20,7 +20,7 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
   }, [language]);
 
   const t = (key: TranslationKey): string => {
-    return translations[language][key] || translations.en[key] || key;
+    return translations[language]?.[key] || translations.en[key] || key;
   };
 
   return (

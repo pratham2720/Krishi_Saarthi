@@ -267,21 +267,21 @@ export function YieldPrediction() {
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.3} />
                                             <XAxis
                                                 dataKey="date"
-                                                tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
+                                                tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }}
                                                 tickLine={false}
                                                 axisLine={false}
                                                 tickFormatter={(value, index) => index % 2 === 0 ? `W${index + 1}` : ''}
                                             />
                                             <YAxis
                                                 domain={[0, 1]}
-                                                tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
+                                                tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }}
                                                 tickLine={false}
                                                 axisLine={false}
                                             />
                                             <Tooltip
                                                 cursor={{ fill: 'hsl(var(--muted)/0.2)' }}
-                                                contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px' }}
-                                                labelStyle={{ color: 'hsl(var(--foreground))' }}
+                                                contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '8px' }}
+                                                labelStyle={{ color: 'var(--foreground)' }}
                                             />
                                             <Bar dataKey="ndvi" radius={[4, 4, 0, 0]}>
                                                 {prediction.ndvi.time_series.map((entry, index) => (

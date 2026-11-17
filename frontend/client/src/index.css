@@ -1,18 +1,3 @@
-/*@import url('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
-@import "leaflet/dist/leaflet.css";
- @import "leaflet-draw/dist/leaflet.draw.css";
-@import "leaflet-control-geocoder/dist/Control.Geocoder.css";*/
-/*@import url("https://unpkg.com/leaflet@1.9.4/dist/leaflet.css");
-@import url("https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css");
-@import url("https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css");*/
-
-@import url("https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css");
-@import url("https://unpkg.com/leaflet@1.9.4/dist/leaflet.css");
-@import url("https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css");
-
-
-
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -187,7 +172,7 @@
 }
 
 .material-symbols-outlined {
-  font-family: 'Material Symbols Outlined';
+  font-family: 'Material Symbols Outlined Variable';
   font-weight: normal;
   font-style: normal;
   font-size: 24px;

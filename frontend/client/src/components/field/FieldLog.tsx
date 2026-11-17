@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from "react";
+import { format } from "date-fns";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import clsx from "clsx";
@@ -16,7 +17,7 @@ import { cn } from "@/lib/utils";
 import { logger } from "@/lib/logger";
 import "./FieldLog.css";
 
-type ActivityType = "Watering" | "Fertilizer" | "Sowing" | "Pesticide" | "Harvest" | "Other";
+type ActivityType = "watering" | "fertilizer" | "sowing" | "pesticide" | "harvest" | "other";
 
 interface LogEntry {
   id: number;
@@ -33,12 +34,12 @@ interface AlertEntry {
 }
 
 const activityConfig: Record<ActivityType, { icon: string; color: string; bg: string }> = {
-  Watering: { icon: "water_drop", color: "text-blue-600", bg: "bg-blue-100" },
-  Fertilizer: { icon: "inventory_2", color: "text-amber-600", bg: "bg-amber-100" },
-  Sowing: { icon: "grass", color: "text-primary", bg: "bg-primary/20" },
-  Pesticide: { icon: "bug_report", color: "text-red-600", bg: "bg-red-100" },
-  Harvest: { icon: "agriculture", color: "text-orange-600", bg: "bg-orange-100" },
-  Other: { icon: "eco", color: "text-muted-foreground", bg: "bg-muted" },
+  watering: { icon: "water_drop", color: "text-blue-600", bg: "bg-blue-100" },
+  fertilizer: { icon: "inventory_2", color: "text-amber-600", bg: "bg-amber-100" },
+  sowing: { icon: "grass", color: "text-primary", bg: "bg-primary/20" },
+  pesticide: { icon: "bug_report", color: "text-red-600", bg: "bg-red-100" },
+  harvest: { icon: "agriculture", color: "text-orange-600", bg: "bg-orange-100" },
+  other: { icon: "eco", color: "text-muted-foreground", bg: "bg-muted" },
 };
 
 export function FieldLog() {
@@ -49,7 +50,7 @@ export function FieldLog() {
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [activity, setActivity] = useState<ActivityType>("Watering");
+  const [activity, setActivity] = useState<ActivityType>("watering");
   const [details, setDetails] = useState("");
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [alerts, setAlerts] = useState<AlertEntry[]>([]);
@@ -109,7 +110,7 @@ export function FieldLog() {
 
     setSubmitting(true);
     try {
-      const formattedDate = selectedDate.toISOString().split("T")[0];
+      const formattedDate = format(selectedDate, "yyyy-MM-dd");
       const newLog = await apiFetch<LogEntry>('/field/logs', {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Token ${token}` },
@@ -123,7 +124,7 @@ export function FieldLog() {
       const alertsData = await apiFetch<AlertEntry[]>(alertsEndpoint, { headers: { Authorization: `Token ${token}` } });
       setAlerts(alertsData);
 
-      setActivity("Watering");
+      setActivity("watering");
       setDetails("");
       setShowModal(false);
       toast({ title: "Log saved", description: "Activity recorded successfully." });
@@ -136,7 +137,7 @@ export function FieldLog() {
   };
 
   const getTileContent = (date: Date) => {
-    const dateStr = date.toISOString().split("T")[0];
+    const dateStr = format(date, "yyyy-MM-dd");
     const dayLogs = logs.filter((log) => log.date === dateStr);
     const dayAlerts = alerts.filter((alert) => alert.date === dateStr);
 
@@ -145,8 +146,8 @@ export function FieldLog() {
     return (
       <div className="mt-1 flex flex-col gap-0.5">
         {dayLogs.slice(0, 2).map((log) => (
-          <div key={`log-${log.id}`} className={cn("text-[10px] rounded px-1 py-0.5 truncate flex items-center gap-0.5", activityConfig[log.activity].bg, activityConfig[log.activity].color)} title={log.details}>
-            <span className="material-symbols-outlined text-[10px]">{activityConfig[log.activity].icon}</span>
+          <div key={`log-${log.id}`} className={cn("text-[10px] rounded px-1 py-0.5 truncate flex items-center gap-0.5", (activityConfig[log.activity] || activityConfig.other).bg, (activityConfig[log.activity] || activityConfig.other).color)} title={log.details}>
+            <span className="material-symbols-outlined text-[10px]">{(activityConfig[log.activity] || activityConfig.other).icon}</span>
             {log.activity}
           </div>
         ))}
@@ -162,11 +163,11 @@ export function FieldLog() {
 
   const getDetailsPlaceholder = () => {
     switch (activity) {
-      case "Watering": return "Enter amount (liters) or irrigation type...";
-      case "Fertilizer": return "Enter type and quantity (kg)...";
-      case "Sowing": return "Enter seeds per row or area...";
-      case "Pesticide": return "Enter type and dosage...";
-      case "Harvest": return "Enter estimated yield...";
+      case "watering": return "Enter amount (liters) or irrigation type...";
+      case "fertilizer": return "Enter type and quantity (kg)...";
+      case "sowing": return "Enter seeds per row or area...";
+      case "pesticide": return "Enter type and dosage...";
+      case "harvest": return "Enter estimated yield...";
       default: return "Enter notes...";
     }
   };

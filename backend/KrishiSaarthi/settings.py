@@ -25,7 +25,13 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
+DEMO_MODE = os.environ.get('DEMO_MODE', 'False').lower() == 'true'
+
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
+
+if DEMO_MODE and not DEBUG:
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured('DEMO_MODE is only supported with DEBUG=True')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 if not DEBUG:
@@ -107,7 +113,7 @@ WSGI_APPLICATION = 'KrishiSaarthi.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': os.environ.get('DEMO_DATABASE_PATH', BASE_DIR / 'demo.sqlite3') if DEMO_MODE else BASE_DIR / 'db.sqlite3',
         'CONN_MAX_AGE': 600,  # Connection pooling (10 minutes)
         'OPTIONS': {
             'timeout': 20,  # SQLite specific: lock timeout
@@ -151,6 +157,8 @@ USE_TZ = True
 
 # Cache Configuration
 try:
+    if not os.environ.get('REDIS_URL'):
+        raise ImportError('Redis is optional; opt in with REDIS_URL')
     import django_redis
     CACHES = {
         'default': {
@@ -252,8 +260,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # REST Framework Configuration
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-        'knox.auth.TokenAuthentication',
+        'KrishiSaarthi.authentication.CompatibleTokenAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -366,6 +373,10 @@ else:
 
     # Auth feature flags
     REQUIRE_EMAIL_VERIFICATION = os.environ.get('REQUIRE_EMAIL_VERIFICATION', 'False').lower() == 'true'
+
+# Rehearsals load many dashboard panels; keep rate limiting with a local demo budget.
+if DEMO_MODE:
+    REST_FRAMEWORK['DEFAULT_THROTTLE_RATES'].update(burst='600/min', sustained='10000/day')
 
 # ──── Test overrides ──────────────────────────────────────────────
 # Disable throttling during test runs so rate limits don't interfere

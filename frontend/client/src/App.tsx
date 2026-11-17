@@ -1,3 +1,4 @@
+import { DemoNotice } from "@/components/common/DemoNotice";
 import { lazy, Suspense } from "react";
 import { Switch, Route, Redirect } from "wouter";
 import { queryClient } from "./lib/queryClient";
@@ -74,6 +75,7 @@ function App() {
               <TooltipProvider>
                 <FieldProvider>
                   <Toaster />
+                  <DemoNotice />
                   <Router />
                 </FieldProvider>
               </TooltipProvider>
