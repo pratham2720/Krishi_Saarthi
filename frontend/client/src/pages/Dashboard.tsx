@@ -22,6 +22,7 @@ import { PriceForecast } from "@/components/finance/PriceForecast";
 import { SchemeMatcher } from "@/components/finance/SchemeMatcher";
 import { InsuranceClaims } from "@/components/finance/InsuranceClaims";
 import { HomeDashboard } from "@/components/dashboard/HomeDashboard";
+import { useField } from "@/context/FieldContext";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 
@@ -91,6 +92,7 @@ export default function Dashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const { user, token, logout } = useAuth();
+  const { fields, selectedField, setSelectedField } = useField();
   const [unreadAlertCount, setUnreadAlertCount] = useState(0);
 
   const setActiveTab = useCallback((tab: string) => {
@@ -310,7 +312,15 @@ export default function Dashboard() {
 
         {/* Dashboard Content - Scrollable */}
         <div className="flex-1 overflow-y-auto p-4 md:p-8">
-          {renderTabContent()}
+          <div className="mb-5 flex items-center gap-3 flex-wrap">
+              <label htmlFor="active-field" className="text-sm font-medium">Active field</label>
+              <select id="active-field" className="rounded-md border bg-background p-2 text-sm max-w-full" value={selectedField?.id || ''}
+                onChange={e => setSelectedField(fields.find(field => field.id === Number(e.target.value)) || null)}>
+                <option value="">New field…</option>
+                {fields.map(field => <option value={field.id} key={field.id}>{field.name} · {field.cropType}</option>)}
+              </select>
+            </div>
+            {renderTabContent()}
         </div>
       </main>
 

@@ -112,6 +112,11 @@ class InsuranceClaimSerializer(serializers.ModelSerializer):
             'field': {'required': False},
         }
 
+    def validate(self, attrs):
+        if self.instance is None and 'field' not in attrs:
+            raise serializers.ValidationError({'field_id': 'A field is required.'})
+        return attrs
+
     def get_masked_bank_account(self, obj):
         acct = obj.bank_account or ''
         if len(acct) <= 4:

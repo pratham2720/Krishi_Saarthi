@@ -1,3 +1,4 @@
+import { area as polygonArea } from "@turf/turf";
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useAuth } from "./AuthContext";
 import { API_BASE_URL } from "@/lib/api";
@@ -47,7 +48,8 @@ export const FieldProvider = ({ children }: { children: ReactNode }) => {
             });
 
             if (res.ok) {
-                const data = await res.json();
+                const raw: Field[] = await res.json();
+                const data = raw.map(field => ({...field, area: Number((polygonArea(field.polygon) / 4046.8564224).toFixed(2))}));
                 setFields(data);
 
                 // Select first field by default if none selected or if selected is not in list

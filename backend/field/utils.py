@@ -13,6 +13,10 @@ def fetchEEData(user=None, field_id=None, field_instance=None, start_date=None, 
     Proxy to new safe Earth Engine service.
     Maintained for backward compatibility.
     """
+    from django.conf import settings
+    if settings.DEMO_MODE:
+        from .demo import satellite_data
+        return satellite_data(user=user, field_id=field_id, field_instance=field_instance)
     return fetchEEData_safe(user, field_id, field_instance, start_date, end_date)
 
 

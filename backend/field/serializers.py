@@ -8,6 +8,7 @@ class PestSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'uploaded_at']
 
 class FieldDataResponseSerializer(serializers.Serializer):
+    source = serializers.CharField(required=False)
     NDVI = serializers.FloatField(allow_null=True)
     EVI = serializers.FloatField(allow_null=True)
     SAVI = serializers.FloatField(allow_null=True)

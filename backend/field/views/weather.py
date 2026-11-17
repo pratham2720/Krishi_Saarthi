@@ -22,6 +22,11 @@ class WeatherView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
+        from django.conf import settings
+        if settings.DEMO_MODE:
+            from ..demo import weather_data
+            return Response(weather_data())
+
         # Get API key from environment
         api_key = os.environ.get('OPENWEATHER_API_KEY')
         if not api_key:

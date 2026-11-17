@@ -107,3 +107,11 @@ docker-compose.override.yml
 *.key
 *.crt
 service-account.json
+# Frontend source is not a Python build directory
+!frontend/client/src/lib/
+!frontend/client/src/lib/**
+
+backend/demo.sqlite3*
+
+frontend/test-results/
+frontend/playwright-report/

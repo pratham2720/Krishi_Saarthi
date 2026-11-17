@@ -29,14 +29,6 @@ class ChatView(APIView):
     throttle_classes = [GeminiChatThrottle]
 
     def post(self, request):
-        if not _gemini_api_key:
-            # Lazy re-check at request time in case env was set after import
-            api_key = os.environ.get('GEMINI_API_KEY')
-            if api_key:
-                genai.configure(api_key=api_key)
-            else:
-                return Response({'error': 'Chat service not configured'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
-
         question = request.data.get('question', '').strip()
         session_id = request.data.get('sessionId')
         clear_history = request.data.get('clearHistory', False)
@@ -49,6 +41,14 @@ class ChatView(APIView):
                 {'error': f'Question too long. Maximum {MAX_QUESTION_LENGTH} characters.'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+        if not settings.DEMO_MODE and not _gemini_api_key:
+            # Lazy re-check at request time in case env was set after import
+            api_key = os.environ.get('GEMINI_API_KEY')
+            if api_key:
+                genai.configure(api_key=api_key)
+            else:
+                return Response({'error': 'Chat service not configured'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
         # Get or Create Session — always scoped to the requesting user
         if not session_id:
@@ -106,29 +106,33 @@ Redirect politely if asked about non-agriculture topics.
 Goal: Improve farm productivity, sustainability, and farmer success with actionable guidance."""
 
         try:
-            model = genai.GenerativeModel(
-                model_name="gemini-2.5-flash",
-                system_instruction=system_instruction
-            )
-
-            chat = model.start_chat(history=chat_history)
-            response = chat.send_message(question)
-
-            reply_text = response.text
+            if settings.DEMO_MODE:
+                from field.demo import chat_reply
+                reply_text = chat_reply(question)
+            else:
+                reply_text = self._generate_reply(system_instruction, chat_history, question)
 
             # Save Messages to DB
             ChatMessage.objects.create(session=session, role='user', text=question)
             ChatMessage.objects.create(session=session, role='model', text=reply_text)
-
-            return Response({
-                'reply': reply_text,
-                'sessionId': session.session_id,
-                'conversationLength': len(db_history) + 2  # Avoid extra COUNT query
-            })
-
+            return Response({'reply': reply_text, 'sessionId': session.session_id,
+                             'conversationLength': len(db_history) + 2,
+                             'source': 'demo' if settings.DEMO_MODE else 'gemini'})
         except Exception as e:
-            logger.error("Gemini Error: %s", e, exc_info=True)
-            return Response({'error': 'Chat service temporarily unavailable'}, status=status.HTTP_502_BAD_GATEWAY)
+            logger.error('Chat error: %s', e, exc_info=True)
+            return Response({'error': 'Chat service temporarily unavailable'}, status=502)
+
+    @staticmethod
+    def _generate_reply(system_instruction, chat_history, question):
+        model = genai.GenerativeModel(
+            model_name="gemini-2.5-flash",
+            system_instruction=system_instruction
+        )
+
+        chat = model.start_chat(history=chat_history)
+        response = chat.send_message(question)
+
+        return response.text
 
 class ChatHistoryView(APIView):
     permission_classes = [permissions.IsAuthenticated]

@@ -71,12 +71,12 @@ export function DataAnalytics() {
     fetchAWD();
 
     if (selectedField) {
-      apiFetch<{ lat: number; lon: number }>(
+      apiFetch<{ coord: [number, number] | null }>(
         `/field/coord?field_id=${selectedField.id}`
       )
         .then((data) => {
-          if (data.lat && data.lon) {
-            setMapCenter([data.lat, data.lon]);
+          if (data.coord) {
+            setMapCenter([data.coord[1], data.coord[0]]);
             setLocation("My Field Location");
           }
         })

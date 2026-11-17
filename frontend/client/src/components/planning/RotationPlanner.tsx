@@ -35,7 +35,7 @@ interface RotationData {
     field_name: string;
     current_crop: string;
     current_season: string;
-    crop_history: { year: number; season: string; crop: string }[];
+    crop_history: { records: { year: number; season: string; crop: string }[]; note: string | null };
     suggestions: Suggestion[];
     timeline: TimelineItem[];
     soil_health_tips: SoilTip[];
@@ -88,7 +88,7 @@ export function RotationPlanner() {
                         Crop Rotation Planner
                     </h1>
                     <p className="text-muted-foreground">
-                        AI suggestions for {data?.field_name || selectedField.name}
+                        Rule-based suggestions for {data?.field_name || selectedField.name}
                     </p>
                 </div>
                 <Button onClick={fetchRotation} variant="outline" disabled={loading}>
@@ -241,7 +241,7 @@ export function RotationPlanner() {
                         </CardHeader>
                         <CardContent>
                             <div className="flex flex-wrap gap-2">
-                                {data.crop_history.map((h, idx) => (
+                                {data.crop_history.records.map((h, idx) => (
                                     <div key={idx} className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-sm">
                                         {h.season} {h.year}: <span className="font-medium">{h.crop}</span>
                                     </div>

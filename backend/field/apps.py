@@ -8,6 +8,9 @@ class FieldConfig(AppConfig):
     name = 'field'
 
     def ready(self):
+        from django.conf import settings
+        if settings.DEMO_MODE or not os.environ.get('GEE_PROJECT'):
+            return
         try:
             import ee
             # Attempt to initialize Earth Engine

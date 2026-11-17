@@ -69,13 +69,13 @@ export function HealthGauge({
                             <span className="material-symbols-outlined text-base">
                                 water_drop
                             </span>
-                            <span>Soil Moisture: Optimal</span>
+                            <span>Check moisture in the field</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <span className="material-symbols-outlined text-base">
                                 bug_report
                             </span>
-                            <span>Pests: None Detected</span>
+                            <span>Pest inspection recommended</span>
                         </div>
                     </div>
                 </div>
